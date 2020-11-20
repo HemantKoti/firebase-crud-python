@@ -77,6 +77,24 @@ payments = db.collection('payments')
 #     except Exception as e:
 #         return f"An Error Occured: {e}"
 
+account_sid = 'ACf99d181bee7652734862dd42cb0c7601'
+auth_token = 'b13582320472c60b71fc7912e7c03ec2'
+client = Client(account_sid, auth_token)
+
+
+def send_sms(msg):
+    """
+    send sms using twilio
+    """
+    message = client.messages \
+                    .create(
+                        body=msg,
+                        from_='+18454437370',
+                        to='+17169397014'
+                    )
+
+    print(message.sid)
+
 
 @app.route('/addPayment', methods=['POST'])
 def addPayments():
@@ -101,13 +119,14 @@ def makePayments():
     try:
         payment_id = request.body['id']
         if payment_id and payments.document(payment_id).get():
-            payments.document(payment_id).update({"paid":True})
+            payments.document(payment_id).update({"paid": True})
             return jsonify({"success": True}), 200
         else:
-            raise Exception("Payment Id not found") 
+            raise Exception("Payment Id not found")
 
     except Exception as e:
-        return "An error occurred" 
+        return "An error occurred"
+
 
 @app.route('/getAll', methods=['POST'])
 def getAll():
@@ -118,10 +137,7 @@ def getAll():
 
         return jsonify({"success": True}), 200
     except Exception as e:
-        return "An error occurred" 
-
-
-
+        return "An error occurred"
 
 
 port = int(os.environ.get('PORT', 8080))
